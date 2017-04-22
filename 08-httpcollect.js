@@ -10,26 +10,16 @@
   complete String of characters sent by the server.*/
 
 let http = require('http')
+let bl = require('bl')
 
-http.get(process.argv[2], (res) => {
-    let rawData = '';
-    res.setEncoding('utf8')
-    res.on('data', (chunk) => {
-        rawData += chunk;        
-    })   
-    res.on('end', () => {
-        try {
-            printAnswer(rawData)
-        } catch (e) {
-            console.error(e.message);
-        }
-    });   
+http.get(process.argv[2], (response) => {
+    response.pipe(bl(function (err, data) {
+        if (err) return console.error(err)
+
+        data = data.toString()
+        // 1) The first line you write should just be an integer representing the number of characters received from the server
+        console.log(data.length)
+        // 2) The second line should contain the complete String of characters sent by the server
+        console.log(data)
+    }))
 })
-
-function printAnswer(rawData) {
-    // 1) The first line you write should just be an integer representing the number of characters received from the server
-    console.log(rawData.length)
-
-    // 2) The second line should contain the complete String of characters sent by the server
-    console.log(rawData)  
-}
